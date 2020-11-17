@@ -1,15 +1,15 @@
 import 'package:flutter/foundation.dart';
 
-class Shop with ChangeNotifier {
+class Compra with ChangeNotifier {
   final String id;
   final String titulo;
-  final int quantia;
-  final double descricao;
+  final bool status;
+  final String descricao;
 
-  Shop({
+  Compra({
     this.id,
     @required this.titulo,
-    @required this.quantia,
+    @required this.status,
     @required this.descricao,
   });
 }

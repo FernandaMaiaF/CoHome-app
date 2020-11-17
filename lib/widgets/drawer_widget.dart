@@ -119,7 +119,9 @@ class DrawerWidget extends StatelessWidget {
                 title: Text(
                   'Sair',
                 ),
-                onTap: () {},
+                onTap: () {
+                  Navigator.of(context).pushReplacementNamed(AppRoutes.LOGIN);
+                },
               ),
             ],
           ),

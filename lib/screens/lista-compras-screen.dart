@@ -1,51 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
 import '../utils/app-routes.dart';
 import '../widgets/drawer_widget.dart';
+import '../providers/lista-compras.dart';
 
-class LabeledCheckbox extends StatelessWidget {
-  const LabeledCheckbox({
-    this.title,
-    this.subtile,
-    this.padding,
-    this.value,
-    this.onChanged,
-  });
-
-  final String title;
-  final String subtile;
-  final EdgeInsets padding;
-  final bool value;
-  final Function onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () {
-        onChanged(!value);
-      },
-      child: Padding(
-        padding: padding,
-        child: ListTile(
-          leading: Icon(
-            Icons.shopping_bag,
-            color: Theme.of(context).primaryColor,
-          ),
-          title: Text(title),
-          subtitle: Text(subtile),
-          trailing: Checkbox(
-            checkColor: Theme.of(context).primaryColorLight,
-            activeColor: Theme.of(context).primaryColor,
-            value: value,
-            onChanged: (bool newValue) {
-              onChanged(newValue);
-            },
-          ),
-          dense: true,
-        ),
-      ),
-    );
-  }
-}
+import '../widgets/product-item.dart';
 
 class ListaComprasScreen extends StatefulWidget {
   @override
@@ -53,47 +13,48 @@ class ListaComprasScreen extends StatefulWidget {
 }
 
 class _ListaComprasScreenState extends State<ListaComprasScreen> {
-  bool _isSelected = false;
   @override
   Widget build(BuildContext context) {
-    final List<String> itens = <String>['Arroz', 'Azeitona', 'Pão'];
-    final List<String> descricao = <String>[
-      '1 branco',
-      '2 potes da verde',
-      '10 paes frances'
-    ];
+    final productsData = Provider.of<Lista>(context);
+    final products = productsData.items;
 
     return Scaffold(
-        appBar: AppBar(
-          title: Text(
-            'Lista de Compras',
-            style: TextStyle(
-              color: Theme.of(context).primaryColorLight,
-            ),
+      appBar: AppBar(
+        title: Text(
+          'Lista de Compras',
+          style: TextStyle(
+            color: Theme.of(context).primaryColorLight,
           ),
         ),
-        drawer: DrawerWidget(),
-        body: Container(
-          child: ListView.builder(
-              padding: const EdgeInsets.all(8),
-              itemCount: itens.length,
-              itemBuilder: (BuildContext context, int index) {
-                return Card(
-                  elevation: 6,
-                  child: Column(children: [
-                    LabeledCheckbox(
-                        title: '${itens[index]}',
-                        subtile: '${descricao[index]}',
-                        padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                        value: _isSelected,
-                        onChanged: (bool newValue) {
-                          setState(() {
-                            _isSelected = newValue;
-                          });
-                        }),
-                  ]),
-                );
-              }),
-        ));
+        actions: <Widget>[
+          IconButton(
+            icon: const Icon(Icons.add),
+            onPressed: () {
+              Navigator.of(context).pushNamed(
+                AppRoutes.LISTA_COMPRAS_FORM,
+              );
+            },
+          ),
+        ],
+      ),
+      drawer: DrawerWidget(),
+      body: new Card(
+        elevation: 6,
+        child: ListView.builder(
+          itemCount: productsData.itemsCount,
+          itemBuilder: (ctx, i) => Column(children: <Widget>[
+            ProductItem(products[i]),
+            Divider(),
+          ]),
+        ),
+      ),
+      floatingActionButton: new FloatingActionButton(
+        tooltip: 'Add task',
+        child: new Icon(Icons.add),
+        backgroundColor: Theme.of(context).primaryColor,
+        onPressed: () => Navigator.of(context)
+            .pushReplacementNamed(AppRoutes.LISTA_COMPRAS_FORM),
+      ),
+    );
   }
 }
