@@ -71,8 +71,7 @@ class DrawerWidget extends StatelessWidget {
                   'Editar Perfil',
                 ),
                 onTap: () {
-                  Navigator.of(context)
-                      .pushReplacementNamed(AppRoutes.DADOS_PESSOAIS);
+                  Navigator.of(context).pushReplacementNamed(AppRoutes.PERFIL);
                 },
               ),
               Divider(),

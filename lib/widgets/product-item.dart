@@ -30,6 +30,7 @@ class _ProductItemState extends State<ProductItem> {
         activeColor: Theme.of(context).primaryColor,
         value: _value,
         onChanged: (bool newValue) {
+          widget.product.toggleItem();
           setState(() {
             _value = newValue;
           });

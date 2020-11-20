@@ -1,172 +1,153 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
+import '../providers/user-provider.dart';
 
-import '../utils/app-routes.dart';
 import '../widgets/drawer_widget.dart';
+import '../utils/app-routes.dart';
 
-class DadosPessoaisScreen extends StatelessWidget {
+class DadosPessoaisScreen extends StatefulWidget {
+  @override
+  _DadosPessoaisScreenState createState() => _DadosPessoaisScreenState();
+}
+
+class _DadosPessoaisScreenState extends State<DadosPessoaisScreen> {
+  TextEditingController nomeEditingController = TextEditingController();
+  TextEditingController emailEditingController = TextEditingController();
+  TextEditingController nascimentoEditingController = TextEditingController();
+
+  DateTime selectedDate = new DateTime(2020);
+
+  Future<void> _selectDate(BuildContext context) async {
+    final DateTime picked = await showDatePicker(
+        initialDatePickerMode: DatePickerMode.year,
+        context: context,
+        initialDate: new DateTime.now(),
+        firstDate: new DateTime.now().subtract(Duration(days: 54750)),
+        lastDate: new DateTime.now());
+
+    print(selectedDate);
+    nascimentoEditingController.text = DateFormat('dd/MM/yyyy').format(picked);
+    setState(() => selectedDate = picked);
+  }
+
   @override
   Widget build(BuildContext context) {
+    GlobalKey<FormState> _form = GlobalKey();
+    bool _isLoading = false;
+    Map<String, String> _user = {
+      'nome': 'Fernanda Maia',
+      'email': 'teste@123',
+      'nascimento': '14/11/1999',
+    };
+
+    void _submit() {
+      if (!_form.currentState.validate()) {
+        return;
+      }
+      setState(() {
+        _isLoading = true;
+      });
+      _form.currentState.save();
+
+      //if dados = dados pessoais
+      setState(() {
+        _isLoading = false;
+      });
+    }
+
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          'Perfil',
-          style: TextStyle(
-            color: Theme.of(context).primaryColorLight,
+        appBar: AppBar(
+          title: Text(
+            'Dados Pessoais',
+            style: TextStyle(
+              color: Theme.of(context).primaryColorLight,
+            ),
           ),
         ),
-      ),
-      drawer: DrawerWidget(),
-      body: ListView(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(5),
-            child: Card(
-              elevation: 6,
+        drawer: DrawerWidget(),
+        body: SingleChildScrollView(
+          child: Container(
+            padding: EdgeInsets.all(20),
+            child: Form(
+              key: _form,
               child: Column(
-                children: <Widget>[
-                  ListTile(
-                    title: Text('Dados Pessoais'),
-                    trailing: FlatButton.icon(
-                      onPressed: () => {}, //_changeFamilycontext,user),
-                      color: Colors.grey[200],
-                      icon: Icon(
-                        Icons.edit,
-                        color: Theme.of(context).primaryColor,
-                        size: 18,
+                children: [
+                  TextButton.icon(
+                    label: Text(
+                      'Voltar',
+                      style: TextStyle(color: Theme.of(context).primaryColor),
+                    ),
+                    icon: Icon(
+                      Icons.arrow_back_ios,
+                      color: Theme.of(context).primaryColor,
+                    ),
+                    onPressed: () {
+                      Navigator.of(context)
+                          .pushReplacementNamed(AppRoutes.PERFIL);
+                    },
+                  ),
+                  TextFormField(
+                    decoration: InputDecoration(labelText: 'Nome'),
+                    controller: nomeEditingController,
+                    validator: (value) {
+                      if (value.isEmpty || value.length > 30) {
+                        return 'Nome deve ter no máximo 30 caracteres';
+                      }
+                      return null;
+                    },
+                    onSaved: (value) => _user['nome'] = value,
+                  ),
+                  TextFormField(
+                    decoration: InputDecoration(labelText: 'Email'),
+                    controller: emailEditingController,
+                    keyboardType: TextInputType.emailAddress,
+                    validator: (value) {
+                      if (value.isEmpty || !value.contains('@')) {
+                        return "Informe um e-mail válido";
+                      }
+                      return null;
+                    },
+                    onSaved: (value) => _user['email'] = value,
+                  ),
+                  InkWell(
+                    onTap: () => _selectDate(context),
+                    child: IgnorePointer(
+                      child: TextFormField(
+                        controller: nascimentoEditingController,
+                        decoration: InputDecoration(
+                          labelText: 'Nascimento',
+                        ),
+                        validator: (value) {
+                          if (value.isEmpty) {
+                            return 'Campo obrigatório';
+                          }
+                          return null;
+                        },
+                        onSaved: (value) => _user['nascimento'] = value,
                       ),
-                      label: Text(
-                        'Editar',
-                        style: TextStyle(color: Theme.of(context).primaryColor),
-                      ),
                     ),
                   ),
-                  Divider(),
-                  ListTile(
-                    leading: Icon(
-                      Icons.person,
-                      color: Theme.of(context).primaryColor,
-                    ),
-                    title: Text('User.nome'),
-                    subtitle: Text('Nome'),
-                    dense: true,
+                  Container(
+                    padding: EdgeInsets.all(10),
                   ),
-                  ListTile(
-                    leading: Icon(
-                      Icons.wc,
-                      color: Theme.of(context).primaryColor,
+                  RaisedButton(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30),
                     ),
-                    title: Text('user.sexo'),
-                    subtitle: Text('Sexo'),
-                    dense: true,
-                  ),
-                  ListTile(
-                    leading: Icon(
-                      Icons.calendar_today,
-                      color: Theme.of(context).primaryColor,
+                    color: Theme.of(context).primaryColor,
+                    textColor: Theme.of(context).primaryColorLight,
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 30,
+                      vertical: 8,
                     ),
-                    title: Text('user.nascimento'),
-                    subtitle: Text('Nascimento'),
-                    dense: true,
+                    child: Text('CONTINUAR'),
+                    onPressed: _submit,
                   ),
                 ],
               ),
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.all(5),
-            child: Card(
-              elevation: 6,
-              child: Column(
-                children: <Widget>[
-                  ListTile(
-                    title: Text('Segurança'),
-                  ),
-                  Divider(),
-                  ListTile(
-                    leading: Icon(
-                      Icons.lock,
-                      color: Theme.of(context).primaryColor,
-                    ),
-                    title: Text('******'),
-                    subtitle: Text('Senha'),
-                    trailing: FlatButton(
-                      onPressed: () =>
-                          {}, //_changePasswordDialog(context,user),
-                      child: Text(
-                        'Alterar',
-                        style: TextStyle(color: Theme.of(context).errorColor),
-                      ),
-                    ),
-                    dense: true,
-                  ),
-                ],
-              ),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(5),
-            child: Card(
-              elevation: 6,
-              child: Column(
-                children: <Widget>[
-                  ListTile(
-                    title: Text('Família'),
-                    trailing: FlatButton.icon(
-                      onPressed: () => {
-                        Navigator.of(context)
-                            .pushReplacementNamed(AppRoutes.HOME),
-                      }, //_changeFamilycontext,user),
-                      color: Colors.grey[200],
-                      icon: Icon(
-                        Icons.add,
-                        color: Theme.of(context).primaryColor,
-                        size: 18,
-                      ),
-                      label: Text(
-                        'Nova',
-                        style: TextStyle(color: Theme.of(context).primaryColor),
-                      ),
-                    ),
-                  ),
-                  Divider(),
-                  ListTile(
-                    leading: Icon(
-                      Icons.group_add,
-                      color: Theme.of(context).primaryColor,
-                    ),
-                    title: Text('user.familiax'),
-                    subtitle: Text('Familia'),
-                    trailing: IconButton(
-                      icon: Icon(
-                        Icons.arrow_forward_ios_sharp,
-                        color: Theme.of(context).primaryColor,
-                      ),
-                      onPressed: () {},
-                    ),
-                    dense: true,
-                  ),
-                  ListTile(
-                    leading: Icon(
-                      Icons.group_add,
-                      color: Theme.of(context).primaryColor,
-                    ),
-                    title: Text('user.familiay'),
-                    subtitle: Text('Familia'),
-                    trailing: IconButton(
-                      icon: Icon(
-                        Icons.arrow_forward_ios_sharp,
-                        color: Theme.of(context).primaryColor,
-                      ),
-                      onPressed: () {},
-                    ),
-                    dense: true,
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
+        ));
   }
 }
