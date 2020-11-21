@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../providers/auth.dart';
 import '../utils/app-routes.dart';
 
 class DrawerWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final user = Provider.of<Auth>(context);
     return ConstrainedBox(
       constraints: const BoxConstraints.expand(width: 304),
       child: Material(
@@ -42,7 +45,7 @@ class DrawerWidget extends StatelessWidget {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      'User Name',
+                                      user.nome,
                                       style: TextStyle(
                                         color:
                                             Theme.of(context).primaryColorLight,
@@ -51,7 +54,9 @@ class DrawerWidget extends StatelessWidget {
                                       ),
                                     ),
                                     Text(
-                                      'Familia',
+                                      user.family == null
+                                          ? 'Sem família'
+                                          : 'Família',
                                       style: TextStyle(
                                         color:
                                             Theme.of(context).primaryColorLight,
@@ -65,6 +70,16 @@ class DrawerWidget extends StatelessWidget {
                   ],
                 )),
               ),
+              ListTile(
+                leading: Icon(Icons.home),
+                title: Text(
+                  'Home Page',
+                ),
+                onTap: () {
+                  Navigator.of(context).pushReplacementNamed(AppRoutes.HOME);
+                },
+              ),
+              Divider(),
               ListTile(
                 leading: Icon(Icons.edit),
                 title: Text(
@@ -119,7 +134,8 @@ class DrawerWidget extends StatelessWidget {
                   'Sair',
                 ),
                 onTap: () {
-                  Navigator.of(context).pushReplacementNamed(AppRoutes.LOGIN);
+                  Navigator.of(context)
+                      .pushReplacementNamed(AppRoutes.AUTH_HOME);
                 },
               ),
             ],

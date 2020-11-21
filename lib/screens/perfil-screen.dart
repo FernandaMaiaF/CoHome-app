@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 
+import 'package:provider/provider.dart';
+import '../providers/auth.dart';
 import '../utils/app-routes.dart';
 import '../widgets/drawer_widget.dart';
 
 class PerfilScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final user = Provider.of<Auth>(context);
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -49,7 +52,7 @@ class PerfilScreen extends StatelessWidget {
                       Icons.person,
                       color: Theme.of(context).primaryColor,
                     ),
-                    title: Text('User.nome'),
+                    title: Text(user.nome),
                     subtitle: Text('Nome'),
                     dense: true,
                   ),
@@ -58,7 +61,7 @@ class PerfilScreen extends StatelessWidget {
                       Icons.mail_outline,
                       color: Theme.of(context).primaryColor,
                     ),
-                    title: Text('user.email'),
+                    title: Text(user.email),
                     subtitle: Text('email'),
                     dense: true,
                   ),
@@ -132,22 +135,27 @@ class PerfilScreen extends StatelessWidget {
                     ),
                   ),
                   Divider(),
-                  ListTile(
-                    leading: Icon(
-                      Icons.group_add,
-                      color: Theme.of(context).primaryColor,
-                    ),
-                    title: Text('user.familiax'),
-                    subtitle: Text('Familia'),
-                    trailing: IconButton(
-                      icon: Icon(
-                        Icons.arrow_forward_ios_sharp,
-                        color: Theme.of(context).primaryColor,
-                      ),
-                      onPressed: () {},
-                    ),
-                    dense: true,
-                  ),
+                  user.family == null
+                      ? Container(
+                          padding: EdgeInsets.all(10),
+                          child: Text('Sem familia'),
+                        )
+                      : ListTile(
+                          leading: Icon(
+                            Icons.group_add,
+                            color: Theme.of(context).primaryColor,
+                          ),
+                          title: Text('family.nome'),
+                          subtitle: Text('Familia'),
+                          trailing: IconButton(
+                            icon: Icon(
+                              Icons.arrow_forward_ios_sharp,
+                              color: Theme.of(context).primaryColor,
+                            ),
+                            onPressed: () {},
+                          ),
+                          dense: true,
+                        ),
                 ],
               ),
             ),
@@ -161,11 +169,10 @@ class PerfilScreen extends StatelessWidget {
                 children: <Widget>[
                   ListTile(
                     title: Text('Convites'),
-                    subtitle: Text('(Somente administrador)'),
                     trailing: FlatButton.icon(
                       onPressed: () => {
                         Navigator.of(context)
-                            .pushReplacementNamed(AppRoutes.HOME),
+                            .pushReplacementNamed(AppRoutes.CONVITE_SCREEN),
                       }, //_changeFamilycontext,user),
                       color: Colors.grey[200],
                       icon: Icon(
@@ -174,7 +181,7 @@ class PerfilScreen extends StatelessWidget {
                         size: 18,
                       ),
                       label: Text(
-                        'Enviar Convite',
+                        'Convite',
                         style: TextStyle(color: Theme.of(context).primaryColor),
                       ),
                     ),

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import '../providers/user-provider.dart';
+import '../providers/family-provider.dart';
 
 import '../widgets/drawer_widget.dart';
 import '../utils/app-routes.dart';
@@ -36,9 +36,9 @@ class _DadosPessoaisScreenState extends State<DadosPessoaisScreen> {
     GlobalKey<FormState> _form = GlobalKey();
     bool _isLoading = false;
     Map<String, String> _user = {
-      'nome': 'Fernanda Maia',
-      'email': 'teste@123',
-      'nascimento': '14/11/1999',
+      'nome': '',
+      'email': '',
+      'nascimento': '',
     };
 
     void _submit() {

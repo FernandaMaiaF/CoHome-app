@@ -41,7 +41,7 @@ class HomePage extends StatelessWidget {
                 ),
               ),
               Text(
-                'Adicionar uma família',
+                'Criar Família',
                 style: TextStyle(
                   fontSize: 13,
                 ),
@@ -49,7 +49,7 @@ class HomePage extends StatelessWidget {
             ],
           ),
           Container(
-            padding: EdgeInsets.all(10),
+            padding: EdgeInsets.all(30),
           ),
           Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -64,11 +64,14 @@ class HomePage extends StatelessWidget {
                     size: 40,
                   ),
                   backgroundColor: Theme.of(context).primaryColor,
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.of(context)
+                        .pushReplacementNamed(AppRoutes.CONVITE_SCREEN);
+                  },
                 ),
               ),
               Text(
-                'Ingressar em família',
+                'Ver Convites',
                 style: TextStyle(
                   fontSize: 13,
                 ),
