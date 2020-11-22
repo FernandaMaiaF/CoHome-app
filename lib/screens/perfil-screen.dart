@@ -1,14 +1,23 @@
 import 'package:flutter/material.dart';
 
 import 'package:provider/provider.dart';
-import '../providers/auth.dart';
+import '../providers/userInfo1.dart';
+import '../providers/auth1.dart';
 import '../utils/app-routes.dart';
 import '../widgets/drawer_widget.dart';
 
 class PerfilScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final user = Provider.of<Auth>(context);
+    final user = Provider.of<UserInfo>(context);
+    final auth = Provider.of<Auth1>(context);
+
+    Future<int> _getInvites() async {
+      final responseCode =
+          await user.getAndSaveUserInviteList(user.userId, auth.token);
+      return responseCode;
+    }
+
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -33,7 +42,7 @@ class PerfilScreen extends StatelessWidget {
                       onPressed: () => {
                         Navigator.of(context)
                             .pushReplacementNamed(AppRoutes.DADOS_PESSOAIS),
-                      }, //_changeFamilycontext,user),
+                      },
                       color: Colors.grey[200],
                       icon: Icon(
                         Icons.edit,
@@ -70,7 +79,7 @@ class PerfilScreen extends StatelessWidget {
                       Icons.calendar_today,
                       color: Theme.of(context).primaryColor,
                     ),
-                    title: Text('user.nascimento'),
+                    title: Text(user.dateBirth),
                     subtitle: Text('Nascimento'),
                     dense: true,
                   ),
@@ -96,8 +105,10 @@ class PerfilScreen extends StatelessWidget {
                     title: Text('******'),
                     subtitle: Text('Senha'),
                     trailing: FlatButton(
-                      onPressed: () =>
-                          {}, //_changePasswordDialog(context,user),
+                      onPressed: () => {
+                        Navigator.of(context)
+                            .pushReplacementNamed(AppRoutes.SEGURANCA_FORM),
+                      },
                       child: Text(
                         'Alterar',
                         style: TextStyle(color: Theme.of(context).errorColor),
@@ -117,22 +128,25 @@ class PerfilScreen extends StatelessWidget {
                 children: <Widget>[
                   ListTile(
                     title: Text('Família'),
-                    trailing: FlatButton.icon(
-                      onPressed: () => {
-                        Navigator.of(context)
-                            .pushReplacementNamed(AppRoutes.HOME),
-                      }, //_changeFamilycontext,user),
-                      color: Colors.grey[200],
-                      icon: Icon(
-                        Icons.add,
-                        color: Theme.of(context).primaryColor,
-                        size: 18,
-                      ),
-                      label: Text(
-                        'Nova',
-                        style: TextStyle(color: Theme.of(context).primaryColor),
-                      ),
-                    ),
+                    trailing: user.family == null
+                        ? FlatButton.icon(
+                            onPressed: () => {
+                              Navigator.of(context)
+                                  .pushReplacementNamed(AppRoutes.HOME),
+                            },
+                            color: Colors.grey[200],
+                            icon: Icon(
+                              Icons.add,
+                              color: Theme.of(context).primaryColor,
+                              size: 18,
+                            ),
+                            label: Text(
+                              'Nova',
+                              style: TextStyle(
+                                  color: Theme.of(context).primaryColor),
+                            ),
+                          )
+                        : null,
                   ),
                   Divider(),
                   user.family == null
@@ -145,14 +159,17 @@ class PerfilScreen extends StatelessWidget {
                             Icons.group_add,
                             color: Theme.of(context).primaryColor,
                           ),
-                          title: Text('family.nome'),
+                          title: Text(user.familyName),
                           subtitle: Text('Familia'),
                           trailing: IconButton(
                             icon: Icon(
                               Icons.arrow_forward_ios_sharp,
                               color: Theme.of(context).primaryColor,
                             ),
-                            onPressed: () {},
+                            onPressed: () {
+                              Navigator.of(context)
+                                  .pushReplacementNamed(AppRoutes.FAMILY_HOME);
+                            },
                           ),
                           dense: true,
                         ),
@@ -168,40 +185,18 @@ class PerfilScreen extends StatelessWidget {
               child: Column(
                 children: <Widget>[
                   ListTile(
-                    title: Text('Convites'),
-                    trailing: FlatButton.icon(
-                      onPressed: () => {
-                        Navigator.of(context)
-                            .pushReplacementNamed(AppRoutes.CONVITE_SCREEN),
-                      }, //_changeFamilycontext,user),
-                      color: Colors.grey[200],
-                      icon: Icon(
-                        Icons.send,
-                        color: Theme.of(context).primaryColor,
-                        size: 18,
-                      ),
-                      label: Text(
-                        'Convite',
-                        style: TextStyle(color: Theme.of(context).primaryColor),
-                      ),
-                    ),
-                  ),
-                  Divider(),
-                  ListTile(
-                    leading: Icon(
-                      Icons.new_releases,
-                      color: Theme.of(context).primaryColor,
-                    ),
-                    title: Text('Familia'),
+                    title: Text('Ver meus convites'),
                     trailing: IconButton(
                       icon: Icon(
-                        Icons.check,
+                        Icons.arrow_forward_ios_sharp,
                         color: Theme.of(context).primaryColor,
-                        size: 18,
                       ),
-                      onPressed: () {},
+                      onPressed: () {
+                        _getInvites();
+                        Navigator.of(context)
+                            .pushReplacementNamed(AppRoutes.CONVITE_SCREEN);
+                      },
                     ),
-                    dense: true,
                   ),
                 ],
               ),

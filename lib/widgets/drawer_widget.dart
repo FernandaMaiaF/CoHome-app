@@ -1,12 +1,40 @@
+import 'package:app_tasks/providers/userInfo1.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../providers/auth.dart';
+import '../providers/auth1.dart';
+import '../providers/userInfo1.dart';
+import '../providers/familyInfo1.dart';
 import '../utils/app-routes.dart';
 
-class DrawerWidget extends StatelessWidget {
+class DrawerWidget extends StatefulWidget {
+  @override
+  _DrawerWidgetState createState() => _DrawerWidgetState();
+}
+
+class _DrawerWidgetState extends State<DrawerWidget> {
   @override
   Widget build(BuildContext context) {
-    final user = Provider.of<Auth>(context);
+    final authInfo = Provider.of<Auth1>(context);
+    final user = Provider.of<UserInfo>(context);
+    final familyInfo = Provider.of<FamilyInfo>(context);
+
+    Future<void> _getFamilyInfo() async {
+      Navigator.of(context).pushReplacementNamed(AppRoutes.FAMILY_HOME);
+      return Future.value();
+    }
+
+    Future<int> _getBuyProducts() async {
+      final responseCode = await familyInfo.getBuyList(authInfo.token);
+      Navigator.of(context).pushReplacementNamed(AppRoutes.LISTA_COMPRAS);
+      return responseCode;
+    }
+
+    Future<int> _getTaskList() async {
+      final responseCode = await familyInfo.getTaskList(authInfo.token);
+      Navigator.of(context).pushReplacementNamed(AppRoutes.LISTA_TAREFAS);
+      return responseCode;
+    }
+
     return ConstrainedBox(
       constraints: const BoxConstraints.expand(width: 304),
       child: Material(
@@ -50,13 +78,13 @@ class DrawerWidget extends StatelessWidget {
                                         color:
                                             Theme.of(context).primaryColorLight,
                                         fontWeight: FontWeight.bold,
-                                        fontSize: 20,
+                                        fontSize: 17,
                                       ),
                                     ),
                                     Text(
                                       user.family == null
                                           ? 'Sem família'
-                                          : 'Família',
+                                          : user.familyName,
                                       style: TextStyle(
                                         color:
                                             Theme.of(context).primaryColorLight,
@@ -76,7 +104,11 @@ class DrawerWidget extends StatelessWidget {
                   'Home Page',
                 ),
                 onTap: () {
-                  Navigator.of(context).pushReplacementNamed(AppRoutes.HOME);
+                  if (user.family != null) {
+                    _getFamilyInfo();
+                  } else {
+                    Navigator.of(context).pushReplacementNamed(AppRoutes.HOME);
+                  }
                 },
               ),
               Divider(),
@@ -89,53 +121,59 @@ class DrawerWidget extends StatelessWidget {
                   Navigator.of(context).pushReplacementNamed(AppRoutes.PERFIL);
                 },
               ),
-              Divider(),
-              ListTile(
-                leading: Icon(Icons.calendar_today),
-                title: Text(
-                  'Calendário',
+
+              if (user.family != null) Divider(),
+              if (user.family != null)
+                ListTile(
+                  leading: Icon(Icons.shopping_cart),
+                  title: Text(
+                    'Lista de Compras',
+                  ),
+                  onTap: () {
+                    if (user.family != null) {
+                      _getBuyProducts();
+                    } else {
+                      Navigator.of(context)
+                          .pushReplacementNamed(AppRoutes.HOME);
+                    }
+                  },
                 ),
-                onTap: () {
-                  Navigator.of(context)
-                      .pushReplacementNamed(AppRoutes.CALENDARIO_SCREEN);
-                },
-              ),
-              Divider(),
-              ListTile(
-                leading: Icon(Icons.list),
-                title: Text(
-                  'Minhas Tarefas',
+              if (user.family != null) Divider(),
+              if (user.family != null)
+                ListTile(
+                  leading: Icon(Icons.list),
+                  title: Text(
+                    'Lista de Tarefas',
+                  ),
+                  onTap: () {
+                    _getTaskList();
+                  },
                 ),
-                onTap: () {},
-              ),
+
               Divider(),
-              ListTile(
-                leading: Icon(Icons.add_circle),
-                title: Text(
-                  'Criar Nova Tarefa',
-                ),
-                onTap: () {},
-              ),
-              Divider(),
-              ListTile(
-                leading: Icon(Icons.shopping_cart),
-                title: Text(
-                  'Lista de Compras',
-                ),
-                onTap: () {
-                  Navigator.of(context)
-                      .pushReplacementNamed(AppRoutes.LISTA_COMPRAS);
-                },
-              ),
-              Divider(),
+              // ListTile(
+              //   leading: Icon(Icons.list),
+              //   title: Text(
+              //     'Minhas Tarefas',
+              //   ),
+              //   onTap: () {},
+              // ),
+              // Divider(),
+              // ListTile(
+              //   leading: Icon(Icons.add_circle),
+              //   title: Text(
+              //     'Criar Nova Tarefa',
+              //   ),
+              //   onTap: () {},
+              // ),
+              // Divider(),
               ListTile(
                 leading: Icon(Icons.keyboard_return),
                 title: Text(
                   'Sair',
                 ),
                 onTap: () {
-                  Navigator.of(context)
-                      .pushReplacementNamed(AppRoutes.AUTH_HOME);
+                  authInfo.logout(context, AppRoutes.AUTH_HOME);
                 },
               ),
             ],

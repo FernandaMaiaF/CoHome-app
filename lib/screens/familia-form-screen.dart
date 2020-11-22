@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 
 import '../widgets/drawer_widget.dart';
 import '../utils/app-routes.dart';
+import 'package:provider/provider.dart';
+import '../providers/userInfo1.dart';
+import '../providers/familyInfo1.dart';
+import '../providers/auth1.dart';
 
 class MyData {
   String id = '';
@@ -36,13 +40,16 @@ class _AdicionarFailiaScreenState extends State<AdicionarFailiaScreen> {
     GlobalKey<FormState> _form = GlobalKey();
     bool _isLoading = false;
     String _nomeFamilia = '';
+    Auth1 auth = Provider.of(context);
+    UserInfo userInfo = Provider.of(context);
+    FamilyInfo familyInfo = Provider.of(context);
     void showSnackBarMessage(String message,
         [MaterialColor color = Colors.red]) {
       Scaffold.of(context)
           .showSnackBar(new SnackBar(content: new Text(message)));
     }
 
-    void _submit() {
+    Future<void> _submit() async {
       if (!_form.currentState.validate()) {
         return;
       }
@@ -51,10 +58,19 @@ class _AdicionarFailiaScreenState extends State<AdicionarFailiaScreen> {
       });
       _form.currentState.save();
 
+      final response = await familyInfo.createFamily(
+          userInfo.userId, _nomeFamilia, auth.token);
+
+      userInfo.changedInfo = response != 409;
+
+      await userInfo.getAndSaveUserData(userInfo.userId, auth.token, true);
+      await familyInfo.getAndSaveFamilyData(userInfo.family, auth.token, true);
+
       //if dados = dados pessoais
       setState(() {
         _isLoading = false;
       });
+      Navigator.of(context).pushReplacementNamed(AppRoutes.FAMILY_HOME);
     }
 
     void _submitDetails() {

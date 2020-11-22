@@ -3,46 +3,43 @@ import 'package:provider/provider.dart';
 
 import '../utils/app-routes.dart';
 import '../widgets/drawer_widget.dart';
-import '../providers/lista-compras.dart';
 import '../providers/familyInfo1.dart';
 import '../providers/auth1.dart';
-//import '../providers/lista-compras.dart';
 
-import '../widgets/product-item.dart';
+import '../widgets/task-item.dart';
 
-class ListaComprasScreen extends StatefulWidget {
+class ListaTarefasScreen extends StatefulWidget {
   @override
-  _ListaComprasScreenState createState() => _ListaComprasScreenState();
+  _ListaTarefasScreenState createState() => _ListaTarefasScreenState();
 }
 
-class _ListaComprasScreenState extends State<ListaComprasScreen> {
+class _ListaTarefasScreenState extends State<ListaTarefasScreen> {
   @override
   Widget build(BuildContext context) {
-    //final productsData = Provider.of<Lista>(context);
     final familyInfo = Provider.of<FamilyInfo>(context);
-    final products = familyInfo.buyList;
+    final tasks = familyInfo.taskList;
 
     final auth = Provider.of<Auth1>(context);
 
-    Future<void> _updateBuyList() async {
-      Map<String, dynamic> finalProducts = {"products": []};
-      List<Map<String, dynamic>> productsArrayInfo = [];
+    Future<void> _updateTaskList() async {
+      Map<String, dynamic> finalTasks = {"tasks": []};
+      List<Map<String, dynamic>> tasksArrayInfo = [];
 
-      for (var _product in familyInfo.buyList) {
-        print("to aqui no " + _product.toString());
-        if (!_product["marked"]) productsArrayInfo.add(_product);
+      for (var _task in familyInfo.taskList) {
+        print("to aqui no " + _task.toString());
+        if (!_task["marked"]) tasksArrayInfo.add(_task);
       }
 
-      finalProducts["products"] = productsArrayInfo;
+      finalTasks["tasks"] = tasksArrayInfo;
 
-      print(productsArrayInfo.toString());
+      print(tasksArrayInfo.toString());
 
-      await familyInfo.changeBuyList(finalProducts, auth.token);
+      await familyInfo.changeTaskList(finalTasks, auth.token);
 
-      await familyInfo.getBuyList(auth.token);
+      await familyInfo.getTaskList(auth.token);
 
       Navigator.of(context).pushNamed(
-        AppRoutes.LISTA_COMPRAS,
+        AppRoutes.LISTA_TAREFAS,
       );
 
       return Future.value();
@@ -51,7 +48,7 @@ class _ListaComprasScreenState extends State<ListaComprasScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Lista de Compras',
+          'Lista de Tarefas',
           style: TextStyle(
             color: Theme.of(context).primaryColorLight,
           ),
@@ -60,7 +57,7 @@ class _ListaComprasScreenState extends State<ListaComprasScreen> {
           IconButton(
             icon: const Icon(Icons.add),
             onPressed: () => Navigator.of(context)
-                .pushReplacementNamed(AppRoutes.LISTA_COMPRAS_FORM),
+                .pushReplacementNamed(AppRoutes.LISTA_TAREFAS_FORM),
           ),
         ],
       ),
@@ -68,9 +65,9 @@ class _ListaComprasScreenState extends State<ListaComprasScreen> {
       body: new Card(
         elevation: 6,
         child: ListView.builder(
-          itemCount: familyInfo.buyList.length,
+          itemCount: familyInfo.taskList.length,
           itemBuilder: (ctx, i) => Column(children: <Widget>[
-            ProductItem(products[i]),
+            TaskItem(tasks[i]),
             Divider(),
           ]),
         ),
@@ -93,12 +90,12 @@ class _ListaComprasScreenState extends State<ListaComprasScreen> {
                   color: Theme.of(context).primaryColorLight,
                 ),
                 label: Text(
-                  'Finalizar Compra',
+                  'Finalizar Tarefas',
                   style: TextStyle(
                     color: Theme.of(context).primaryColorLight,
                   ),
                 ),
-                onPressed: () => _updateBuyList(),
+                onPressed: () => _updateTaskList(),
               ),
             ),
             Container(
@@ -114,13 +111,13 @@ class _ListaComprasScreenState extends State<ListaComprasScreen> {
                   color: Theme.of(context).primaryColorLight,
                 ),
                 label: Text(
-                  'Adicionar Item',
+                  'Adicionar Tarefa',
                   style: TextStyle(
                     color: Theme.of(context).primaryColorLight,
                   ),
                 ),
                 onPressed: () => Navigator.of(context)
-                    .pushReplacementNamed(AppRoutes.LISTA_COMPRAS_FORM),
+                    .pushReplacementNamed(AppRoutes.LISTA_TAREFAS_FORM),
               ),
             )
           ],

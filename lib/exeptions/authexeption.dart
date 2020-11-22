@@ -8,6 +8,7 @@ class AuthException implements Exception {
     "INVALID_PASSWORD": "Senha inválida!",
     "USER_DISABLED": "Usuário desativado!",
     "User created": "Usuário foi Criado!",
+    "User already has this family's invite": "Usuário já tem este convite",
   };
 
   final String key;

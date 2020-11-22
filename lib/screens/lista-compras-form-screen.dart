@@ -5,6 +5,8 @@ import '../utils/app-routes.dart';
 import '../widgets/drawer_widget.dart';
 import '../providers/dados-compras.dart';
 import '../providers/lista-compras.dart';
+import '../providers/familyInfo1.dart';
+import '../providers/auth1.dart';
 
 class ListFormScreen extends StatefulWidget {
   @override
@@ -52,12 +54,8 @@ class _ListFormScreenState extends State<ListFormScreen> {
     }
     _form.currentState.save();
 
-    final product = Compra(
-      id: _formData['id'],
-      titulo: _formData['title'],
-      status: _formData['status'],
-      descricao: _formData['description'],
-    );
+    final product =
+        Compra(titulo: _formData['title'], descricao: _formData['description']);
 
     final products = Provider.of<Lista>(context, listen: false);
     if (_formData['id'] == null) {
@@ -70,6 +68,30 @@ class _ListFormScreenState extends State<ListFormScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final familyInfo = Provider.of<FamilyInfo>(context);
+    final auth = Provider.of<Auth1>(context);
+
+    Future<void> _createProduct() async {
+      var isValid = _form.currentState.validate();
+
+      if (!isValid) {
+        return;
+      }
+      _form.currentState.save();
+
+      final responseCode = await familyInfo.createBuyItem(
+          _formData['title'], _formData['description'], auth.token);
+
+      if (responseCode == 201) {
+        await familyInfo.getBuyList(auth.token);
+        Navigator.of(context).pushNamed(
+          AppRoutes.LISTA_COMPRAS,
+        );
+      }
+
+      return Future.value();
+    }
+
     return Scaffold(
         appBar: AppBar(
           title: Text(
@@ -84,10 +106,7 @@ class _ListFormScreenState extends State<ListFormScreen> {
               onPressed: () {
                 print(_formData['title']);
                 print(_formData['description']);
-                _saveForm();
-                Navigator.of(context).pushNamed(
-                  AppRoutes.LISTA_COMPRAS,
-                );
+                _createProduct();
               },
             )
           ],
@@ -99,6 +118,46 @@ class _ListFormScreenState extends State<ListFormScreen> {
             key: _form,
             child: ListView(
               children: <Widget>[
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextButton.icon(
+                        label: Text(
+                          'Voltar',
+                          style:
+                              TextStyle(color: Theme.of(context).primaryColor),
+                        ),
+                        icon: Icon(
+                          Icons.arrow_back_ios,
+                          color: Theme.of(context).primaryColor,
+                        ),
+                        onPressed: () {
+                          Navigator.of(context)
+                              .pushReplacementNamed(AppRoutes.LISTA_COMPRAS);
+                        },
+                      ),
+                    ),
+                    Expanded(
+                      child: TextButton.icon(
+                        label: Text(
+                          'Salvar',
+                          style:
+                              TextStyle(color: Theme.of(context).primaryColor),
+                        ),
+                        icon: Icon(
+                          Icons.save,
+                          color: Theme.of(context).primaryColor,
+                        ),
+                        onPressed: () {
+                          print(_formData['title']);
+                          print(_formData['description']);
+                          _createProduct();
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+                Divider(),
                 TextFormField(
                   initialValue: _formData['title'],
                   decoration: new InputDecoration(

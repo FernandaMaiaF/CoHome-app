@@ -28,7 +28,7 @@ class LoginScreen extends StatelessWidget {
                   margin: EdgeInsets.only(bottom: 20.0),
                   padding: EdgeInsets.symmetric(
                     vertical: 8,
-                    horizontal: 70,
+                    horizontal: deviceSize.width * 0.15,
                   ),
                   decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(20),
@@ -44,9 +44,11 @@ class LoginScreen extends StatelessWidget {
                     children: [
                       Flexible(
                         child: Image(
-                          image: AssetImage('assets/images/logo_cohome.png'),
-                          height: 100,
-                          width: 50,
+                          image: AssetImage(
+                            'assets/images/logo_cohome.png',
+                          ),
+                          //height: 100,
+                          width: deviceSize.width * 0.14,
                         ),
                       ),
                       Container(

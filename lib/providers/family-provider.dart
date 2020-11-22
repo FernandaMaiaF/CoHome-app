@@ -1,13 +1,31 @@
-// import 'dart:async';
+import 'package:flutter/foundation.dart';
 
-// import 'package:flutter/material.dart';
-// import 'package:http/http.dart' as http;
+class FamiliaMembros with ChangeNotifier {
+  String id;
+  final String nome;
 
-// import 'auth.dart';
+  FamiliaMembros({
+    this.id,
+    @required this.nome,
+  });
+}
 
-// class Family with ChangeNotifier {
-//   String nomeFamilia;
-//   String convites;
+final CONVITES = [
+  FamiliaMembros(
+    id: 'dftyui',
+    nome: 'Fernanda Maia',
+  ),
+  FamiliaMembros(
+    id: 'ftyuio,mn',
+    nome: 'Alessandra Maia',
+  ),
+];
 
-//   Future<void> criarFamilia(String _userId) {}
-// }
+class ListaMembros with ChangeNotifier {
+  List<FamiliaMembros> _items = CONVITES;
+  List<FamiliaMembros> get items => [..._items];
+
+  int get itemsCount {
+    return _items.length;
+  }
+}

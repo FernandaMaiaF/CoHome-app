@@ -1,28 +1,13 @@
 import 'dart:convert';
+import 'package:provider/provider.dart';
 import 'package:app_tasks/exeptions/authexeption.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import './userInfo1.dart';
 
-class RequestControlProvider {
-  final bool requestSuccess;
-
-  RequestControlProvider({
-    @required this.requestSuccess,
-  });
-}
-
-class Auth with ChangeNotifier {
+class Auth1 with ChangeNotifier {
   String _userId;
   String _token;
-  String nome;
-  String email;
-  String dataNascimento;
-  String family;
-  String invites;
-
-  String get fullName {
-    return nome;
-  }
 
   bool get isAuth {
     return token != null;
@@ -40,12 +25,15 @@ class Auth with ChangeNotifier {
     }
   }
 
-  Auth();
+  Auth1();
+
+  static const _globalUrl = 'http://192.168.1.113:3000/';
 
   static const _urlsignup = 'http://192.168.1.113:3000/user/signup';
   static const _urllogin = 'http://192.168.1.113:3000/user/login';
 
-  Future<void> signup(String name, String email, String password) async {
+  Future<void> signup(
+      String name, String email, String password, String birthDate) async {
     final response = await http.post(
       _urlsignup,
       headers: {"Content-Type": "application/json"},
@@ -53,13 +41,14 @@ class Auth with ChangeNotifier {
         'name': name,
         'email': email,
         'password': password,
+        'birthDate': birthDate
       }),
     );
     print(json.decode(response.body));
 
     final responseBody = json.decode(response.body);
 
-    if (responseBody["error" != null]) {
+    if (responseBody["error"] != null) {
       throw AuthException(responseBody['error']['message']);
     } else {
       // Store.saveMap('userData', {
@@ -76,9 +65,8 @@ class Auth with ChangeNotifier {
   }
 
 //  "Authorization": "Bearer " + _token
-  Future<void> login(String email, String password) async {
-    print("abublube " + email);
-    print("sdfjfgbdnfjsd " + password);
+  Future<void> login(
+      String email, String password, BuildContext _context) async {
     final response = await http.post(
       _urllogin,
       headers: {
@@ -99,19 +87,23 @@ class Auth with ChangeNotifier {
       this._token = responseBody["token"];
       this._userId = responseBody["id"];
 
-      userData();
+      UserInfo userInfo = Provider.of(_context, listen: false);
+      userInfo.changedInfo = true;
+      await userInfo.getAndSaveUserData(this._userId, this._token, true);
 
       //this.nome = responseBody["name"];
 
       print("user_id " + this._userId);
+      //print("user_id pelo user info" + userInfo.userId);
       //print("saske2 " + responseBody["name"]);
       //print("saske3" + responseBody);
     }
     notifyListeners();
     return Future.value();
   }
+  /*
 
-  Future<void> userData() async {
+  Future<void> isAuthorized() async {
     final _urlData = 'http://192.168.1.113:3000/user/' + this._userId;
     print(_urlData);
     final response = await http.get(_urlData, headers: {
@@ -131,18 +123,63 @@ class Auth with ChangeNotifier {
 
     return Future.value();
   }
+  */
 
   Future<void> tryAutoLogin() async {
-    if (isAuth) {
+    if (this.isAuth) {
       print("Autenticado");
       return Future.value();
     }
-    print("deu ruim");
+    print("Nao autenticado");
   }
 
-  void logout() {
-    _token = null;
-    _userId = null;
+  bool mayLogout(bool canLogOut) {
+    print("tentado deslogar");
+    if (canLogOut) {
+      print("setando token e userId null");
+      this._token = null;
+      this._userId = null;
+    }
+    //notifyListeners();
+    return canLogOut;
+  }
+
+  Future<void> logout(BuildContext _context, String loginPageCode) {
+    print("tentado deslogar");
+    this._token = null;
+    this._userId = null;
     notifyListeners();
+    Navigator.of(_context).pushReplacementNamed(loginPageCode);
+    return Future.value();
   }
 }
+
+// class Store {
+//   static Future<void> saveString(String key, String value) async {
+//     final prefs = await SharedPreferences.getInstance();
+//     prefs.setString(key, value);
+//   }
+
+//   static Future<void> saveMap(String key, Map<String, dynamic> value) async {
+//     saveString(key, json.encode(value));
+//   }
+
+//   static Future<String> getString(String key) async {
+//     final prefs = await SharedPreferences.getInstance();
+//     return prefs.getString(key);
+//   }
+
+//   static Future<Map<String, dynamic>> getMap(String key) async {
+//     try {
+//       Map<String, dynamic> map = json.decode(await getString(key));
+//       return map;
+//     } catch (_) {
+//       return null;
+//     }
+//   }
+
+//   static Future<bool> remove(String key) async {
+//     final prefs = await SharedPreferences.getInstance();
+//     return prefs.remove(key);
+//   }
+// }

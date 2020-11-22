@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:flutter_rounded_date_picker/rounded_picker.dart';
+
 import 'package:provider/provider.dart';
-import '../providers/auth.dart';
+import '../providers/auth1.dart';
 
 import '../exeptions/authexeption.dart';
 
@@ -20,12 +23,32 @@ class _AuthCardState extends State<AuthCard> {
     'name': '',
     'email': '',
     'password': '',
+    'birthDate': '',
   };
+
+  TextEditingController nascimentoEditingController = TextEditingController();
+
+  DateTime selectedDate = new DateTime(2020);
+
+  Future<void> _selectDate(BuildContext context) async {
+    final DateTime picked = await showRoundedDatePicker(
+        theme: ThemeData(primarySwatch: Colors.teal),
+        //initialDatePickerMode: DatePickerMode.year,
+        context: context,
+        initialDate: new DateTime.now(),
+        firstDate: new DateTime.now().subtract(Duration(days: 54750)),
+        lastDate: new DateTime.now());
+
+    print(selectedDate);
+    nascimentoEditingController.text = DateFormat('dd/MM/yyyy').format(picked);
+    setState(() => selectedDate = picked);
+  }
+
   void _showErrorDialog(String msg) {
     showDialog(
         context: context,
         builder: (ctx) => AlertDialog(
-              title: Text("'Ocorreu um erro"),
+              title: Text("Ocorreu um erro"),
               content: Text(msg),
               actions: <Widget>[
                 FlatButton(
@@ -47,15 +70,15 @@ class _AuthCardState extends State<AuthCard> {
     });
     _form.currentState.save();
 
-    Auth auth = Provider.of(context, listen: false);
+    Auth1 auth = Provider.of(context, listen: false);
     try {
       if (_authMode == AuthMode.Login) {
         print("saske1");
-        await auth.login(_authData["email"], _authData["password"]);
+        await auth.login(_authData["email"], _authData["password"], context);
       } else {
         print("saske2");
-        await auth.signup(
-            _authData["name"], _authData["email"], _authData["password"]);
+        await auth.signup(_authData["name"], _authData["email"],
+            _authData["password"], _authData["birthDate"].toString());
       }
     } on AuthException catch (error) {
       _showErrorDialog(error.toString());
@@ -109,6 +132,25 @@ class _AuthCardState extends State<AuthCard> {
                           }
                         : null,
                     onSaved: (value) => _authData['name'] = value,
+                  ),
+                if (_authMode == AuthMode.Signup)
+                  InkWell(
+                    onTap: () => _selectDate(context),
+                    child: IgnorePointer(
+                      child: TextFormField(
+                        controller: nascimentoEditingController,
+                        decoration: InputDecoration(
+                          labelText: 'Nascimento',
+                        ),
+                        validator: (value) {
+                          if (value.isEmpty) {
+                            return 'Campo obrigatório';
+                          }
+                          return null;
+                        },
+                        onSaved: (value) => _authData['birthDate'] = value,
+                      ),
+                    ),
                   ),
                 TextFormField(
                   decoration: InputDecoration(labelText: 'E-mail'),

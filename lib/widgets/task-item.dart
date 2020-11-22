@@ -6,36 +6,63 @@ import '../providers/dados-compras.dart';
 import '../providers/familyInfo1.dart';
 import '../providers/auth1.dart';
 
-class ProductItem extends StatefulWidget {
-  final Map<String, dynamic> product;
+class TaskItem extends StatefulWidget {
+  final Map<String, dynamic> tasks;
 
-  ProductItem(this.product);
+  TaskItem(this.tasks);
 
   @override
-  _ProductItemState createState() => _ProductItemState();
+  _TaskItemState createState() => _TaskItemState();
 }
 
-class _ProductItemState extends State<ProductItem> {
+class _TaskItemState extends State<TaskItem> {
   @override
   Widget build(BuildContext context) {
-    bool _value = widget.product["marked"];
+    bool _value = widget.tasks["marked"];
 
     final familyInfo = Provider.of<FamilyInfo>(context);
     final auth = Provider.of<Auth1>(context);
 
+    Future<void> _updateTaskList() async {
+      Map<String, dynamic> finalTasks = {"tasks": []};
+      List<Map<String, dynamic>> tasksArrayInfo = [];
+
+      for (var _task in familyInfo.taskList) {
+        print("to aqui no " + _task.toString());
+        if (!_task["marked"]) tasksArrayInfo.add(_task);
+      }
+
+      finalTasks["tasks"] = tasksArrayInfo;
+
+      print(tasksArrayInfo.toString());
+
+      await familyInfo.changeTaskList(finalTasks, auth.token);
+
+      await familyInfo.getTaskList(auth.token);
+
+      /*
+      Navigator.of(context).pushNamed(
+        AppRoutes.LISTA_TAREFAS,
+      );
+      */
+
+      return Future.value();
+    }
+
+    /*
     Future<void> _updateBuyList() async {
       Map<String, dynamic> finalProducts;
       List<Map<String, dynamic>> productsArrayInfo;
 
-      for (var _product in familyInfo.buyList) {
-        if (!_product["marked"])
+      for (var _task in familyInfo.taskList) {
+        if (!_task["marked"])
           productsArrayInfo.add({
             "productName": _product["productName"],
             "productDesc": _product["productDesc"]
           });
       }
 
-      finalProducts["products"] = productsArrayInfo;
+      finalProducts["tasks"] = productsArrayInfo;
 
       print(productsArrayInfo.toString());
 
@@ -45,14 +72,15 @@ class _ProductItemState extends State<ProductItem> {
 
       return Future.value();
     }
+    */
 
     return ListTile(
       leading: Icon(
-        Icons.shopping_bag,
+        Icons.list,
         color: Theme.of(context).primaryColor,
       ),
-      title: Text(widget.product["productName"]),
-      subtitle: Text(widget.product["productDesc"]),
+      title: Text(widget.tasks["taskName"]),
+      //subtitle: Text(widget.tasks["productDesc"]),
       trailing: Checkbox(
         checkColor: Theme.of(context).primaryColorLight,
         activeColor: Theme.of(context).primaryColor,
@@ -64,7 +92,7 @@ class _ProductItemState extends State<ProductItem> {
             print("entrou no set");
 
             _value = newValue;
-            widget.product["marked"] = newValue;
+            widget.tasks["marked"] = newValue;
           });
         },
       ),
