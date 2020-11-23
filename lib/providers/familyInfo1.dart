@@ -2,6 +2,8 @@ import 'dart:convert';
 import 'package:app_tasks/exeptions/authexeption.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import "../utils/constants.dart";
+import '../utils/constants.dart';
 
 class FamilyInfo with ChangeNotifier {
   String familyId;
@@ -16,11 +18,9 @@ class FamilyInfo with ChangeNotifier {
 
   FamilyInfo();
 
-  static const _globalUrl = 'http://192.168.1.113:3000/';
-
   Future<void> getAndSaveFamilyData(
       String _familyId_, String _token_, bool _notify) async {
-    final _urlData = 'http://192.168.1.113:3000/family/' + _familyId_;
+    final _urlData = Constants.BASE_API_URL + 'family/' + _familyId_;
     print("get " + _urlData);
     final response = await http.get(_urlData, headers: {
       "Content-Type": "application/json",
@@ -42,7 +42,7 @@ class FamilyInfo with ChangeNotifier {
 
   Future<int> createFamily(
       String _adminId, String _newFamilyName, String _token_) async {
-    final _urlData = 'http://192.168.1.113:3000/family/';
+    final _urlData = Constants.BASE_API_URL + 'family/';
     print("post " + _urlData);
     final reqBody = json.encode({"admin": _adminId, "name": _newFamilyName});
     final response = await http.post(_urlData,
@@ -63,7 +63,7 @@ class FamilyInfo with ChangeNotifier {
     this.members = [];
 
     final _urlData =
-        'http://192.168.1.113:3000/family/' + this.familyId + "/members";
+        Constants.BASE_API_URL + 'family/' + this.familyId + "/members";
     print("get " + _urlData);
 
     final response = await http.get(_urlData, headers: {
@@ -87,7 +87,8 @@ class FamilyInfo with ChangeNotifier {
     buyList = [];
 
     final _urlData =
-        'http://192.168.1.113:3000/family/' + this.familyId + "/invite";
+        Constants.BASE_API_URL + 'family/' + this.familyId + "/invite";
+
     print("post " + _urlData);
 
     final reqBody = json.encode({"email": _email_});
@@ -111,7 +112,8 @@ class FamilyInfo with ChangeNotifier {
     buyList = [];
 
     final _urlData =
-        'http://192.168.1.113:3000/family/' + this.familyId + "/buyList";
+        Constants.BASE_API_URL + 'family/' + this.familyId + "/buyList";
+
     print("get " + _urlData);
 
     final response = await http.get(_urlData, headers: {
@@ -136,7 +138,8 @@ class FamilyInfo with ChangeNotifier {
   Future<int> createBuyItem(
       String newItemName, String newItemDesc, String _token_) async {
     final _urlData =
-        'http://192.168.1.113:3000/family/' + this.familyId + "/buyList";
+        Constants.BASE_API_URL + 'family/' + this.familyId + "/buyList";
+
     print("post " + _urlData);
 
     final reqBody = json.encode({
@@ -162,7 +165,8 @@ class FamilyInfo with ChangeNotifier {
       Map<String, dynamic> newBuyItens, String _token_) async {
     print("new itens : " + newBuyItens.toString());
     final _urlData =
-        'http://192.168.1.113:3000/family/' + this.familyId + "/buyList";
+        Constants.BASE_API_URL + 'family/' + this.familyId + "/buyList";
+
     print("patch " + _urlData);
 
     final reqBody = json.encode({"products": newBuyItens["products"]});
@@ -189,7 +193,8 @@ class FamilyInfo with ChangeNotifier {
     taskList = [];
 
     final _urlData =
-        'http://192.168.1.113:3000/family/' + this.familyId + "/taskList";
+        Constants.BASE_API_URL + 'family/' + this.familyId + "/taskList";
+
     print("get " + _urlData);
 
     final response = await http.get(_urlData, headers: {
@@ -213,7 +218,8 @@ class FamilyInfo with ChangeNotifier {
 
   Future<int> createTaskItem(String newTaskName, String _token_) async {
     final _urlData =
-        'http://192.168.1.113:3000/family/' + this.familyId + "/taskList";
+        Constants.BASE_API_URL + 'family/' + this.familyId + "/taskList";
+
     print("post " + _urlData);
 
     final reqBody = json.encode({
@@ -239,7 +245,7 @@ class FamilyInfo with ChangeNotifier {
       Map<String, dynamic> newTaksItens, String _token_) async {
     print("new itens : " + newTaksItens.toString());
     final _urlData =
-        'http://192.168.1.113:3000/family/' + this.familyId + "/taskList";
+        Constants.BASE_API_URL + 'family/' + this.familyId + "/taskList";
     print("patch " + _urlData);
 
     final reqBody = json.encode({"tasks": newTaksItens["tasks"]});

@@ -1,3 +1,3 @@
 class Constants {
-  static const BASE_API_URL = 'http://localhost:3000/user/';
+  static const BASE_API_URL = 'http://192.168.24.113:3000/';
 }

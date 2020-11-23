@@ -94,6 +94,7 @@ class _ProductItemState extends State<ProductItem> {
 
       if (responseCode == 200) {
         await userInfo.getAndSaveUserData(userInfo.userId, auth.token, true);
+
         await showDialog(
             context: context,
             builder: (ctx) => AlertDialog(
@@ -108,6 +109,7 @@ class _ProductItemState extends State<ProductItem> {
                     ),
                   ],
                 ));
+
         _getInvites();
       } else if (responseCode == 409) {
         await showDialog(
@@ -124,6 +126,7 @@ class _ProductItemState extends State<ProductItem> {
                     ),
                   ],
                 ));
+
         _getInvites();
       } else {
         await showDialog(
@@ -141,6 +144,7 @@ class _ProductItemState extends State<ProductItem> {
                     ),
                   ],
                 ));
+
         _getInvites();
       }
 
@@ -195,7 +199,7 @@ class _ProductItemState extends State<ProductItem> {
                         builder: (ctx) => AlertDialog(
                               title: Text('Tem certeza?'),
                               content: Text('Gostaria de entrar para a ' +
-                                  userInfo.familyName),
+                                  widget.product["familyName"]),
                               actions: <Widget>[
                                 FlatButton(
                                     child: Text(
@@ -238,7 +242,7 @@ class _ProductItemState extends State<ProductItem> {
                               title: Text('Tem certeza?'),
                               content: Text(
                                   'Gostaria de recusar o convite da ' +
-                                      userInfo.familyName),
+                                      widget.product["familyName"]),
                               actions: <Widget>[
                                 FlatButton(
                                     child: Text(

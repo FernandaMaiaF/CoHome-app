@@ -4,8 +4,11 @@ import 'package:flutter_rounded_date_picker/rounded_picker.dart';
 
 import 'package:provider/provider.dart';
 import '../providers/auth1.dart';
+import '../providers/userInfo1.dart';
 
 import '../exeptions/authexeption.dart';
+
+import '../utils/app-routes.dart';
 
 enum AuthMode { Signup, Login }
 
@@ -61,37 +64,6 @@ class _AuthCardState extends State<AuthCard> {
             ));
   }
 
-  Future<void> _submit() async {
-    if (!_form.currentState.validate()) {
-      return;
-    }
-    setState(() {
-      _isLoading = true;
-    });
-    _form.currentState.save();
-
-    Auth1 auth = Provider.of(context, listen: false);
-    try {
-      if (_authMode == AuthMode.Login) {
-        print("saske1");
-        await auth.login(_authData["email"], _authData["password"], context);
-      } else {
-        print("saske2");
-        await auth.signup(_authData["name"], _authData["email"],
-            _authData["password"], _authData["birthDate"].toString());
-      }
-    } on AuthException catch (error) {
-      _showErrorDialog(error.toString());
-    } catch (error) {
-      print("saskenaruto" + error.toString());
-      _showErrorDialog("Ocorreu um erro inesperado!");
-    }
-
-    setState(() {
-      _isLoading = false;
-    });
-  }
-
   void _switchAuthMode() {
     if (_authMode == AuthMode.Login) {
       setState(() {
@@ -107,6 +79,54 @@ class _AuthCardState extends State<AuthCard> {
   @override
   Widget build(BuildContext context) {
     final deviceSize = MediaQuery.of(context).size;
+
+    final user = Provider.of<UserInfo>(context);
+
+    Future<void> _submit() async {
+      if (!_form.currentState.validate()) {
+        return;
+      }
+      setState(() {
+        _isLoading = true;
+      });
+      _form.currentState.save();
+
+      Auth1 auth = Provider.of(context, listen: false);
+      try {
+        if (_authMode == AuthMode.Login) {
+          print("saske1");
+          await auth.login(_authData["email"], _authData["password"], context);
+          /*
+          if (await auth.login(
+                  _authData["email"], _authData["password"], context) ==
+              200) {
+            print("carol");
+            await user.getAndSaveUserData(auth.userId, auth.token, true);
+            print("carol1");
+            if (user.family != null)
+              Navigator.of(context).pushReplacementNamed(AppRoutes.HOME);
+            else
+              Navigator.of(context).pushReplacementNamed(AppRoutes.FAMILY_HOME);
+          }
+          print("socorro");
+          */
+        } else {
+          print("saske2");
+          await auth.signup(_authData["name"], _authData["email"],
+              _authData["password"], _authData["birthDate"].toString());
+        }
+      } on AuthException catch (error) {
+        _showErrorDialog(error.toString());
+      } catch (error) {
+        print("saskenaruto" + error.toString());
+        _showErrorDialog("Ocorreu um erro inesperado!");
+      }
+
+      setState(() {
+        _isLoading = false;
+      });
+    }
+
     return Card(
         elevation: 8.0,
         shape: RoundedRectangleBorder(

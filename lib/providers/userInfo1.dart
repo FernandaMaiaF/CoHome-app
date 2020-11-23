@@ -2,6 +2,9 @@ import 'dart:convert';
 import 'package:app_tasks/exeptions/authexeption.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import '../utils/constants.dart';
+import '../utils/constants.dart';
+import '../utils/constants.dart';
 
 class UserInfo with ChangeNotifier {
   String userId;
@@ -22,13 +25,12 @@ class UserInfo with ChangeNotifier {
 
   UserInfo();
 
-  static const _globalUrl = 'http://192.168.1.113:3000/';
-
   Future<void> getAndSaveUserData(
       String _userId_, String _token_, bool _notify) async {
     if (changedInfo) {
       print("fimose");
-      final _urlData = 'http://192.168.1.113:3000/user/' + _userId_;
+      final _urlData = Constants.BASE_API_URL + 'user/' + _userId_;
+
       print("get " + _urlData);
       final response = await http.get(_urlData, headers: {
         "Content-Type": "application/json",
@@ -64,7 +66,7 @@ class UserInfo with ChangeNotifier {
         _newDate +
         " patch arg3 " +
         _token_);
-    final _urlData = 'http://192.168.1.113:3000/user/' + this.userId;
+    final _urlData = Constants.BASE_API_URL + 'user/' + this.userId;
     print("patch " + _urlData);
     final reqBody = json.encode({"name": _newUserName, "birthDate": _newDate});
     final response = await http.patch(_urlData,
@@ -85,7 +87,7 @@ class UserInfo with ChangeNotifier {
 
   Future<int> updateUserPassword(
       String _oldPw, String _newPw, String _userId_, String _token_) async {
-    final _urlData = 'http://192.168.1.113:3000/user/' + _userId_ + "/pw";
+    final _urlData = Constants.BASE_API_URL + 'user/' + _userId_ + "/pw";
     print("patch " + _urlData);
     final reqBody = json.encode({"oldPassword": _oldPw, "newPassword": _newPw});
     final response = await http.patch(_urlData,
@@ -106,7 +108,7 @@ class UserInfo with ChangeNotifier {
 
   Future<int> addUserToFamily(String _familyId_, String _token_) async {
     final _urlData =
-        'http://192.168.1.113:3000/family/' + _familyId_ + "/members";
+        Constants.BASE_API_URL + 'family/' + _familyId_ + "/members";
     print("post " + _urlData);
 
     final reqBody = json.encode({"userId": this.userId});
@@ -127,7 +129,7 @@ class UserInfo with ChangeNotifier {
   }
 
   Future<int> getAndSaveUserInviteList(String _userId_, String _token_) async {
-    final _urlData = 'http://192.168.1.113:3000/user/' + _userId_ + '/invites';
+    final _urlData = Constants.BASE_API_URL + 'user/' + _userId_ + '/invites';
     print("get " + _urlData);
     final response = await http.get(_urlData, headers: {
       "Content-Type": "application/json",
@@ -151,7 +153,7 @@ class UserInfo with ChangeNotifier {
   Future<int> deleteInvite(
       String _userId_, String _familyId, String _token_) async {
     final _urlData =
-        'http://192.168.1.113:3000/user/' + _userId_ + '/invites/' + _familyId;
+        Constants.BASE_API_URL + 'user/' + _userId_ + '/invites/' + _familyId;
     print("delete " + _urlData);
 
     //final reqBody = json.encode({"familyId": _familyId});

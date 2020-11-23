@@ -3,7 +3,9 @@ import 'package:provider/provider.dart';
 import 'package:app_tasks/exeptions/authexeption.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import '../utils/constants.dart';
 import './userInfo1.dart';
+import "../utils/constants.dart";
 
 class Auth1 with ChangeNotifier {
   String _userId;
@@ -27,15 +29,12 @@ class Auth1 with ChangeNotifier {
 
   Auth1();
 
-  static const _globalUrl = 'http://192.168.1.113:3000/';
-
-  static const _urlsignup = 'http://192.168.1.113:3000/user/signup';
-  static const _urllogin = 'http://192.168.1.113:3000/user/login';
-
   Future<void> signup(
       String name, String email, String password, String birthDate) async {
+    const String _urlRoute = Constants.BASE_API_URL + "user/signup";
+
     final response = await http.post(
-      _urlsignup,
+      _urlRoute,
       headers: {"Content-Type": "application/json"},
       body: json.encode({
         'name': name,
@@ -65,10 +64,12 @@ class Auth1 with ChangeNotifier {
   }
 
 //  "Authorization": "Bearer " + _token
-  Future<void> login(
+  Future<int> login(
       String email, String password, BuildContext _context) async {
+    const String _urlRoute = Constants.BASE_API_URL + "user/login";
+
     final response = await http.post(
-      _urllogin,
+      _urlRoute,
       headers: {
         "Content-Type": "application/json",
       },
@@ -99,7 +100,7 @@ class Auth1 with ChangeNotifier {
       //print("saske3" + responseBody);
     }
     notifyListeners();
-    return Future.value();
+    return response.statusCode;
   }
   /*
 
