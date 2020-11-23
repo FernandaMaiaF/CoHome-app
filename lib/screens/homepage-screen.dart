@@ -12,7 +12,7 @@ class HomePage extends StatelessWidget {
     final familyInfo = Provider.of<FamilyInfo>(context, listen: false);
     final userInfo = Provider.of<UserInfo>(context, listen: false);
     final auth = Provider.of<Auth1>(context, listen: false);
-    userInfo.getAndSaveUserData(userInfo.userId, auth.token, false);
+    userInfo.getAndSaveUserData(userInfo.userId, auth.token, true);
     print("buildando NO family home page");
 
     Future<int> _getInvites() async {

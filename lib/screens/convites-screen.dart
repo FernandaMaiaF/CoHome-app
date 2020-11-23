@@ -128,13 +128,30 @@ class _ProductItemState extends State<ProductItem> {
                 ));
 
         _getInvites();
+      } else if (responseCode == 404) {
+        await showDialog(
+            context: context,
+            builder: (ctx) => AlertDialog(
+                  title: Text("Atenção!"),
+                  content: Text('Família não existe mais!'),
+                  actions: <Widget>[
+                    FlatButton(
+                      onPressed: () {
+                        Navigator.of(ctx).pop();
+                      },
+                      child: Text('Fechar'),
+                    ),
+                  ],
+                ));
+
+        _getInvites();
       } else {
         await showDialog(
             context: context,
             builder: (ctx) => AlertDialog(
                   title: Text("Atenção!"),
                   content: Text(
-                      'Ocorreu um problema. Você não pode entrra na família'),
+                      'Ocorreu um problema. Você não pode entrar na família'),
                   actions: <Widget>[
                     FlatButton(
                       onPressed: () {

@@ -59,6 +59,29 @@ class FamilyInfo with ChangeNotifier {
     return response.statusCode;
   }
 
+  Future<int> deleteFamily(String _token_) async {
+    final _urlData = Constants.BASE_API_URL + 'family/' + this.familyId;
+    print("delete " + _urlData);
+
+    final response = await http.delete(_urlData, headers: {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer " + _token_
+    });
+    //print("with status code " + response);
+    final responseData = json.decode(response.body);
+
+    if (response.statusCode == 200) {
+      this.familyId = null;
+      this.familyName = null;
+      this.buyListId = null;
+      this.taskListId = null;
+      this.adminId = null;
+    }
+
+    notifyListeners();
+    return response.statusCode;
+  }
+
   Future<int> getMembers(String _token_) async {
     this.members = [];
 

@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import '../providers/userInfo1.dart';
 import '../utils/app-routes.dart';
 import 'package:provider/provider.dart';
 // import '../providers/family-provider.dart';
 import '../providers/familyInfo1.dart';
 import '../providers/auth1.dart';
+import '../providers/userInfo1.dart';
 import '../widgets/drawer_widget.dart';
 
 class MembrosFamiliaScreen extends StatefulWidget {
@@ -17,10 +19,109 @@ class _MembrosFamiliaScreenState extends State<MembrosFamiliaScreen> {
     //final membros = Provider.of<ListaMembros>(context);
     final familyInfo = Provider.of<FamilyInfo>(context);
     final auth = Provider.of<Auth1>(context);
+    final userInfo = Provider.of<UserInfo>(context);
 
     final pessoas = familyInfo.members;
 
-    print("PESSOAS CU " + pessoas.toString());
+    Future<void> _exitFamily() async {
+      final int resp =
+          await userInfo.removeUserFromFamily(familyInfo.familyId, auth.token);
+      resp == 200
+          ? await showDialog(
+              context: context,
+              builder: (ctx) => AlertDialog(
+                    title: Text("Atenção!"),
+                    content: Text('Você saiu da família.'),
+                    actions: <Widget>[
+                      FlatButton(
+                        onPressed: () {
+                          Navigator.of(ctx).pop();
+                          Navigator.of(context)
+                              .pushReplacementNamed(AppRoutes.HOME);
+                        },
+                        child: Text(
+                          'Fechar',
+                          style:
+                              TextStyle(color: Theme.of(context).primaryColor),
+                        ),
+                      ),
+                    ],
+                  ))
+          : await showDialog(
+              context: context,
+              builder: (ctx) => AlertDialog(
+                    title: Text("Atenção!"),
+                    content: Text('Ocorreu um erro.'),
+                    actions: <Widget>[
+                      FlatButton(
+                        onPressed: () {
+                          Navigator.of(ctx).pop();
+                          Navigator.of(context)
+                              .pushReplacementNamed(AppRoutes.FAMILY_MEMBROS);
+                        },
+                        child: Text(
+                          'Fechar',
+                          style:
+                              TextStyle(color: Theme.of(context).primaryColor),
+                        ),
+                      ),
+                    ],
+                  ));
+
+      return Future.value();
+    }
+
+    Future<void> _deleteFamily() async {
+      final int resp = await familyInfo.deleteFamily(auth.token);
+      if (resp == 200) {
+        userInfo.changedInfo = true;
+        await userInfo.getAndSaveUserData(userInfo.userId, auth.token, true);
+      }
+
+      resp == 200
+          ? await showDialog(
+              context: context,
+              builder: (ctx) => AlertDialog(
+                    title: Text("Atenção!"),
+                    content: Text('Você deletou a família.'),
+                    actions: <Widget>[
+                      FlatButton(
+                        onPressed: () {
+                          Navigator.of(ctx).pop();
+                          Navigator.of(context)
+                              .pushReplacementNamed(AppRoutes.HOME);
+                        },
+                        child: Text(
+                          'Fechar',
+                          style:
+                              TextStyle(color: Theme.of(context).primaryColor),
+                        ),
+                      ),
+                    ],
+                  ))
+          : await showDialog(
+              context: context,
+              builder: (ctx) => AlertDialog(
+                    title: Text("Atenção!"),
+                    content: Text('Ocorreu um erro.'),
+                    actions: <Widget>[
+                      FlatButton(
+                        onPressed: () {
+                          Navigator.of(ctx).pop();
+                          Navigator.of(context)
+                              .pushReplacementNamed(AppRoutes.FAMILY_MEMBROS);
+                        },
+                        child: Text(
+                          'Fechar',
+                          style:
+                              TextStyle(color: Theme.of(context).primaryColor),
+                        ),
+                      ),
+                    ],
+                  ));
+
+      return Future.value();
+    }
 
     return Scaffold(
       appBar: AppBar(
@@ -92,41 +193,111 @@ class _MembrosFamiliaScreenState extends State<MembrosFamiliaScreen> {
                     color: Theme.of(context).primaryColorLight,
                   ),
                   label: Text(
-                    'Sair da Família',
+                    userInfo.userId == familyInfo.adminId
+                        ? 'Deletar família'
+                        : 'Sair da Família',
                     style: TextStyle(
                       color: Theme.of(context).primaryColorLight,
                     ),
                   ),
                   onPressed: () => {
-                        showDialog(
-                            context: context,
-                            builder: (ctx) => AlertDialog(
-                                  title: Text('Tem certeza?'),
-                                  content: Text('Gostaria de sair da família ' +
-                                      familyInfo.familyName),
-                                  actions: <Widget>[
-                                    FlatButton(
-                                        child: Text(
-                                          'Sim',
-                                          style: TextStyle(
-                                              color: Theme.of(context)
-                                                  .primaryColor),
-                                        ),
-                                        onPressed: () {
-                                          Navigator.of(ctx).pop(true);
-                                        }),
-                                    FlatButton(
-                                        child: Text(
-                                          'Não',
-                                          style: TextStyle(
-                                              color:
-                                                  Theme.of(context).errorColor),
-                                        ),
-                                        onPressed: () {
-                                          Navigator.of(ctx).pop(false);
-                                        })
-                                  ],
-                                )),
+                        if (userInfo.userId == familyInfo.adminId)
+                          {
+                            //admin
+
+                            if (familyInfo.members.length > 1)
+                              {
+                                showDialog(
+                                    context: context,
+                                    builder: (ctx) => AlertDialog(
+                                          title: Text("Atenção!"),
+                                          content: Text(
+                                              'Família só pode ser deleta se houver somente 1 membro.'),
+                                          actions: <Widget>[
+                                            FlatButton(
+                                              onPressed: () {
+                                                Navigator.of(ctx).pop();
+                                              },
+                                              child: Text(
+                                                'Fechar',
+                                                style: TextStyle(
+                                                    color: Theme.of(context)
+                                                        .primaryColor),
+                                              ),
+                                            ),
+                                          ],
+                                        ))
+                              }
+                            else
+                              {
+                                showDialog(
+                                    context: context,
+                                    builder: (ctx) => AlertDialog(
+                                          title: Text('Tem certeza?'),
+                                          content: Text(
+                                              'Gostaria de deletar a família ' +
+                                                  familyInfo.familyName),
+                                          actions: <Widget>[
+                                            FlatButton(
+                                                child: Text(
+                                                  'Sim',
+                                                  style: TextStyle(
+                                                      color: Theme.of(context)
+                                                          .primaryColor),
+                                                ),
+                                                onPressed: () {
+                                                  _deleteFamily();
+                                                  Navigator.of(ctx).pop(true);
+                                                }),
+                                            FlatButton(
+                                                child: Text(
+                                                  'Não',
+                                                  style: TextStyle(
+                                                      color: Theme.of(context)
+                                                          .errorColor),
+                                                ),
+                                                onPressed: () {
+                                                  Navigator.of(ctx).pop(false);
+                                                })
+                                          ],
+                                        ))
+                              }
+                          }
+                        else
+                          {
+                            //user normal
+                            showDialog(
+                                context: context,
+                                builder: (ctx) => AlertDialog(
+                                      title: Text('Tem certeza?'),
+                                      content: Text(
+                                          'Gostaria de sair da família ' +
+                                              familyInfo.familyName),
+                                      actions: <Widget>[
+                                        FlatButton(
+                                            child: Text(
+                                              'Sim',
+                                              style: TextStyle(
+                                                  color: Theme.of(context)
+                                                      .primaryColor),
+                                            ),
+                                            onPressed: () {
+                                              _exitFamily();
+                                              Navigator.of(ctx).pop(true);
+                                            }),
+                                        FlatButton(
+                                            child: Text(
+                                              'Não',
+                                              style: TextStyle(
+                                                  color: Theme.of(context)
+                                                      .errorColor),
+                                            ),
+                                            onPressed: () {
+                                              Navigator.of(ctx).pop(false);
+                                            })
+                                      ],
+                                    )),
+                          }
                       }),
             ),
           ],
@@ -137,7 +308,7 @@ class _MembrosFamiliaScreenState extends State<MembrosFamiliaScreen> {
 }
 
 class ProductItem extends StatefulWidget {
-  final String pessoa;
+  final Map<String, dynamic> pessoa;
   final int pessoaPos;
 
   ProductItem(this.pessoa, this.pessoaPos);
@@ -160,10 +331,10 @@ class _ProductItemState extends State<ProductItem> {
             color: Theme.of(context).primaryColor,
           ),
           title: Text(
-            widget.pessoa,
+            widget.pessoa["memberName"],
             style: TextStyle(fontSize: 16),
           ),
-          trailing: widget.pessoaPos == 0
+          trailing: widget.pessoa["memberId"] == familyInfo.adminId
               ? Text(
                   'ADMIN',
                   style: TextStyle(color: Theme.of(context).errorColor),

@@ -72,8 +72,6 @@ class _SegurancaFormScreenState extends State<SegurancaFormScreen> {
                       FlatButton(
                         onPressed: () {
                           Navigator.of(ctx).pop();
-                          Navigator.of(context)
-                              .pushReplacementNamed(AppRoutes.FAMILY_MEMBROS);
                         },
                         child: Text(
                           'Fechar',

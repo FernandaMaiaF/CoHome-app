@@ -28,7 +28,7 @@ class UserInfo with ChangeNotifier {
   Future<void> getAndSaveUserData(
       String _userId_, String _token_, bool _notify) async {
     if (changedInfo) {
-      print("fimose");
+      //print("fimose");
       final _urlData = Constants.BASE_API_URL + 'user/' + _userId_;
 
       print("get " + _urlData);
@@ -39,7 +39,7 @@ class UserInfo with ChangeNotifier {
 
       final responseData = json.decode(response.body);
 
-      print("AGORA VAI SEU SAFADO " + responseData.toString());
+      //print("AGORA VAI SEU SAFADO " + responseData.toString());
 
       this.userId = responseData["id"];
       this.nome = responseData["name"];
@@ -118,6 +118,28 @@ class UserInfo with ChangeNotifier {
           "Authorization": "Bearer " + _token_
         },
         body: reqBody);
+
+    final responseData = json.decode(response.body);
+    print(responseData);
+
+    if (response.statusCode == 200) this.changedInfo = true;
+
+    notifyListeners();
+    return response.statusCode;
+  }
+
+  Future<int> removeUserFromFamily(String _familyId_, String _token_) async {
+    final _urlData = Constants.BASE_API_URL +
+        'family/' +
+        _familyId_ +
+        "/members/" +
+        this.userId;
+    print("post " + _urlData);
+
+    final response = await http.delete(_urlData, headers: {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer " + _token_
+    });
 
     final responseData = json.decode(response.body);
     print(responseData);
